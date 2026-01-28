@@ -12,9 +12,9 @@ const menuItems = [
 const Sidebar = () => {
   const path = usePathname();
   return (
-    <div className="w-64 rounded-r-lg bg-white text-start">
-      <div className="rounded-lg border-b border-zinc-200 px-5 py-1">
-        <h1 className="p-4 text-2xl font-bold text-black">STOCK</h1>
+    <div className="w-64 rounded-r-lg text-start bg-white dark:bg-black ">
+      <div className=" border-b border-zinc-200 dark:border-zinc-800 px-5 py-1">
+        <h1 className="p-4 text-2xl font-bold ">STOCK</h1>
       </div>
 
       <div className="flex flex-col gap-2 p-2">
@@ -25,7 +25,7 @@ const Sidebar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-md px-6 py-3 text-start hover:bg-zinc-200 hover:text-black ${isActive ? "bg-zinc-200 text-black" : "text-black"}`}
+              className={`rounded-md px-6 py-3 text-start hover:bg-zinc-200 hover:text-black dark:hover:text-black ${isActive ? "bg-zinc-200 text-black" : "dark:text-white"}`}
             >
               <item.icon className="mb-1 mr-2 inline" size={16} />
               {item.label}
