@@ -19,4 +19,4 @@ export async function POST(request: Request) {
     return Response.json(newProduct,{
         status: 201,
     });
-}
+} 
