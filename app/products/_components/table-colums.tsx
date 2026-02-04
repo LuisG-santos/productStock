@@ -18,9 +18,20 @@ import {
   PencilIcon,
   TrashIcon,
 } from "lucide-react";
+import { DropdownMenuItem } from "@/app/_components/ui/dropdown-menu";
 import {
-  DropdownMenuItem,
-} from "@/app/_components/ui/dropdown-menu";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/app/_components/ui/alert-dialog";
+import { Dialog } from "@/app/_components/ui/dialog";
+import DeleteDialog from "./deleteDialog";
 
 const translateStatus = (status: string) => {
   switch (status) {
@@ -70,36 +81,40 @@ export const productsTableCol: ColumnDef<products>[] = [
     cell: (row) => {
       const product = row.row.original;
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <MoreHorizontalIcon size={16} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-white rounded-lg dark:bg-zinc-900 hover:bg-gray-700">
-
-            <DropdownMenuItem
-              className="gap-1.5"
-              onClick={() => navigator.clipboard.writeText(product.id)}
-            >
-              <ClipboardCopyIcon size={16} />
-              Copiar ID
-            </DropdownMenuItem>
-
-            <DropdownMenuItem className="gap-1.5">
-              <PencilIcon size={16}/>
-              Editar
+        <AlertDialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">
+                <MoreHorizontalIcon size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="rounded-lg bg-white dark:bg-zinc-900">
+              <DropdownMenuItem
+                className="gap-1.5"
+                onClick={() => navigator.clipboard.writeText(product.id)}
+              >
+                <ClipboardCopyIcon size={16} />
+                Copiar ID
               </DropdownMenuItem>
-            <DropdownMenuSeparator />
 
-            <DropdownMenuItem className="gap-1.5">
-              <TrashIcon size={16}/>
-              Deletar
+              <DropdownMenuItem className="gap-1.5">
+                <PencilIcon size={16} />
+                Editar
               </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuSeparator />
+
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem className="gap-1.5">
+                  <TrashIcon size={16} />
+                  Deletar
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+
+              <DropdownMenuSeparator />
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DeleteDialog productID={product.id} name={product.name}/>
+        </AlertDialog>
       );
     },
   },

@@ -4,6 +4,7 @@ import Sidebar from "./_components/sidebar";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "./_components/ui/theme-provider";
 import Header from "./_components/ui/header";
+import { Toaster } from "./_components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
               <main className="flex-1 overflow-auto p-6">{children}</main>
             </div>
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
