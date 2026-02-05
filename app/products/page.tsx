@@ -8,8 +8,8 @@ const ProductsPage = async () => {
  const products = await getProducts();
 
   return (
-    <div className="h-full space-y-8 rounded-xl bg-white p-5 dark:bg-black">
-      <div className="flex items-center justify-between">
+    <div className="h-full space-y-8 rounded-xl bg-white p-5 overflow-auto dark:bg-black">
+      <div className="flex items-center  justify-between">
         <div className="space-y-1 flex flex-col">
           <span className="text-xs font-semibold text-slate-500">
             Gestão de produtos
