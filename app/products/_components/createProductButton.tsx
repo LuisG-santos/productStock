@@ -4,6 +4,7 @@ import { Button } from "../../_components/ui/button";
 import {Dialog, DialogTrigger,} from "../../_components/ui/dialog";
 import { useState } from "react";
 import UpsertDialogContent from "./upsert-dialog-content";
+import { toast } from "sonner";
 
 const CreateProductsButton = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -16,7 +17,7 @@ const CreateProductsButton = () => {
           Cadastrar Produto
         </Button>
       </DialogTrigger>
-      <UpsertDialogContent onSuccess={() => setIsDialogOpen(false)}/>
+      <UpsertDialogContent onSuccess={() =>{ setIsDialogOpen(false); toast.success("Produto criado com sucesso!",{position: "top-center"})}}/>
      
     </Dialog>
   );
