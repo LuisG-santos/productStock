@@ -23,7 +23,16 @@ import { Button } from "@/app/_components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { products } from "@prisma/client";
-import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/_components/ui/table";
 import { formatCurrency } from "@/app/_helpers/currency";
 import { useMemo } from "react";
 import MoreActions from "./more-actions";
@@ -34,7 +43,7 @@ interface UpsertSheetProps {
 }
 
 const formSchema = z.object({
-  productId: z.uuid({message: "O produto é obrigatório"}),
+  productId: z.uuid({ message: "O produto é obrigatório" }),
   quantity: z.number().int().positive(),
 });
 
@@ -47,7 +56,7 @@ interface SelectedProduct {
   quantity: number;
 }
 
-const UpsertSheet = ({ products, productOption}: UpsertSheetProps) => {
+const UpsertSheet = ({ products, productOption }: UpsertSheetProps) => {
   const [selectedProduct, setSelectedProduct] = useState<SelectedProduct[]>([]);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -58,31 +67,66 @@ const UpsertSheet = ({ products, productOption}: UpsertSheetProps) => {
   });
 
   const onSubmit = (data: FormSchema) => {
-    const selectedProduct = products.find((product) => product.id === data.productId);
+    const selectedProduct = products.find(
+      (product) => product.id === data.productId,
+    );
 
     if (!selectedProduct) return;
 
     setSelectedProduct((currentProducts) => {
-      const existingProduct = currentProducts.find((product) => product.id === selectedProduct.id);
+      const existingProduct = currentProducts.find(
+        (product) => product.id === selectedProduct.id,
+      );
+
       if (existingProduct) {
+        const productIsOutOfStock =
+          existingProduct.quantity + data.quantity > selectedProduct.stock;
+
+        if (productIsOutOfStock) {
+          form.setError("quantity", {
+            message: `Quantidade excede o estoque disponível (${selectedProduct.stock})`,
+          });
+          return currentProducts;
+        }
+        form.reset();
         return currentProducts.map((product) =>
           product.id === selectedProduct.id
             ? { ...product, quantity: product.quantity + data.quantity }
-            : product
+            : product,
         );
       }
-      return [...currentProducts,{ ...selectedProduct,price: Number(selectedProduct.price), quantity: data.quantity }];
+      const productIsOutOfStock = data.quantity > selectedProduct.stock;
+
+      if (productIsOutOfStock) {
+        form.setError("quantity", {
+          message: `Quantidade excede o estoque disponível (${selectedProduct.stock})`,
+        });
+        return currentProducts;
+      }
+      form.reset();
+      return [
+        ...currentProducts,
+        {
+          ...selectedProduct,
+          price: Number(selectedProduct.price),
+          quantity: data.quantity,
+        },
+      ];
     });
-    form.reset();
   };
 
   const productsTotal = useMemo(() => {
-    return formatCurrency(selectedProduct.reduce((total, product) => total + product.price * product.quantity, 0));
+    return formatCurrency(
+      selectedProduct.reduce(
+        (total, product) => total + product.price * product.quantity,
+        0,
+      ),
+    );
   }, [selectedProduct]);
 
   const onDelete = (productId: string) => {
     setSelectedProduct((currentProducts) =>
-      currentProducts.filter((product) => product.id !== productId)
+      currentProducts.filter((product) => product.id !== productId),
     );
   };
 
@@ -126,7 +170,9 @@ const UpsertSheet = ({ products, productOption}: UpsertSheetProps) => {
                     type="number"
                     placeholder="Digite a quantidade"
                     value={isNaN(field.value) ? "" : field.value}
-                    onChange={(e) => field.onChange(Number(e.target.valueAsNumber))}
+                    onChange={(e) =>
+                      field.onChange(Number(e.target.valueAsNumber))
+                    }
                   />
                 </FormControl>
                 <FormMessage />
@@ -136,45 +182,44 @@ const UpsertSheet = ({ products, productOption}: UpsertSheetProps) => {
           <Button className="w-full gap-2" variant="secondary" type="submit">
             <PlusIcon className="mr-2 h-4 w-4" />
             Adicionar produto a venda
-            </Button>
+          </Button>
         </form>
       </Form>
 
       <Table>
-      <TableCaption>Lista dos produtos selecionados</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Produto</TableHead>
-          <TableHead>Preço unitário</TableHead>
-          <TableHead>Quantidade</TableHead>
-          <TableHead className="text-right">Total</TableHead>
-          <TableHead className="text-right">Ações</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {selectedProduct.map((product) => (
-          <TableRow key={product.id}>
-            <TableCell className="font-medium">{product.name}</TableCell>
-            <TableCell>{formatCurrency(product.price)}</TableCell>
-            <TableCell>{product.quantity}</TableCell>
-            <TableCell className="text-right">{formatCurrency(product.price * product.quantity)}</TableCell>
-            <TableCell className="text-right">
-              <MoreActions product={{id: product.id}} onDelete={onDelete} />
-            </TableCell>
+        <TableCaption>Lista dos produtos selecionados</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Produto</TableHead>
+            <TableHead>Preço unitário</TableHead>
+            <TableHead>Quantidade</TableHead>
+            <TableHead className="text-right">Total</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
           </TableRow>
-        ))}
-
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">
-            {productsTotal}
-          </TableCell>
-          <TableCell />
-        </TableRow>
-      </TableFooter>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {selectedProduct.map((product) => (
+            <TableRow key={product.id}>
+              <TableCell className="font-medium">{product.name}</TableCell>
+              <TableCell>{formatCurrency(product.price)}</TableCell>
+              <TableCell>{product.quantity}</TableCell>
+              <TableCell className="text-right">
+                {formatCurrency(product.price * product.quantity)}
+              </TableCell>
+              <TableCell className="text-right">
+                <MoreActions product={{ id: product.id }} onDelete={onDelete} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={3}>Total</TableCell>
+            <TableCell className="text-right">{productsTotal}</TableCell>
+            <TableCell />
+          </TableRow>
+        </TableFooter>
+      </Table>
     </SheetContent>
   );
 };
