@@ -3,6 +3,7 @@
 import {
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
@@ -20,7 +21,7 @@ import {
 import { Input } from "@/app/_components/ui/input";
 import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
 import { Button } from "@/app/_components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { Check, CheckIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { products } from "@prisma/client";
 import {
@@ -36,10 +37,13 @@ import {
 import { formatCurrency } from "@/app/_helpers/currency";
 import { useMemo } from "react";
 import MoreActions from "./more-actions";
+import { createSale } from "@/app/_actions/sale/create-sale";
+import { toast } from "sonner";
 
 interface UpsertSheetProps {
   products: products[];
   productOption: ComboboxOption[];
+  onSubmitSuccess?: () => void;
 }
 
 const formSchema = z.object({
@@ -56,7 +60,7 @@ interface SelectedProduct {
   quantity: number;
 }
 
-const UpsertSheet = ({ products, productOption }: UpsertSheetProps) => {
+const UpsertSheet = ({ products, productOption, onSubmitSuccess }: UpsertSheetProps) => {
   const [selectedProduct, setSelectedProduct] = useState<SelectedProduct[]>([]);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -129,6 +133,25 @@ const UpsertSheet = ({ products, productOption }: UpsertSheetProps) => {
       currentProducts.filter((product) => product.id !== productId),
     );
   };
+
+  const onSubmitSale= async () => {
+
+    try{
+
+      await createSale({
+        products: selectedProduct.map((product) => ({
+          id: product.id,
+          quantity: product.quantity,
+        })),
+      });
+      toast.success("Venda criada com sucesso!");
+      if (onSubmitSuccess) {
+        onSubmitSuccess();
+      }
+    } catch (error) {
+      toast.error("Erro ao criar venda");
+    }
+  }
 
   return (
     <SheetContent className="!max-w-[700px]">
@@ -220,6 +243,13 @@ const UpsertSheet = ({ products, productOption }: UpsertSheetProps) => {
           </TableRow>
         </TableFooter>
       </Table>
+
+      <SheetFooter className="pt-6">
+        <Button disabled={selectedProduct.length === 0} onClick={onSubmitSale} className="w-full">
+          <CheckIcon className="mr-2 h-4 w-4" />
+          Finalizar venda
+        </Button>
+      </SheetFooter>
     </SheetContent>
   );
 };
