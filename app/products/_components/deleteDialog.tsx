@@ -9,21 +9,27 @@ import {
   AlertDialogTitle,
 } from "@/app/_components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useAction } from "next-safe-action/hooks";
 
-interface DeleteProductProps{
-    productID: string;
-    name: string
+interface DeleteProductProps {
+  productID: string;
+  name: string;
 }
 
-const DeleteDialog = ({productID, name}: DeleteProductProps) => {
-    const handleDelete = async ()=>{
-        try{
-            await deleteProduct({id: productID})
-            toast.success("Produto deletado com sucesso",{position: "top-center"})
-        }catch(error){
-            console.error(error)
-        }
-    }
+const DeleteDialog = ({ productID, name }: DeleteProductProps) => {
+  const { execute: executeDeleteProduct } = useAction(deleteProduct, {
+    onSuccess: () => {
+      toast.success("Produto deletado com sucesso", { position: "top-center" });
+    },
+    onError: ({ error }) => {
+      console.error(error);
+      toast.error("Ocorreu um erro ao deletar o produto", {
+        position: "top-center",
+      });
+    },
+  });
+
+  const handleDelete = () => executeDeleteProduct({ id: productID });
 
   return (
     <AlertDialogContent>
@@ -32,8 +38,8 @@ const DeleteDialog = ({productID, name}: DeleteProductProps) => {
           Tem certeza que deseja excluir o produto?
         </AlertDialogTitle>
         <AlertDialogDescription>
-          Você está prestes a excluir esse produto "<code>{name}</code>"
-        . Esta ação não pode ser desfeita. Deseja continuar?
+          Você está prestes a excluir esse produto "<code>{name}</code>" . Esta
+          ação não pode ser desfeita. Deseja continuar?
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
