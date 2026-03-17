@@ -17,7 +17,7 @@ const CreateProductsButton = () => {
           Cadastrar Produto
         </Button>
       </DialogTrigger>
-      <UpsertDialogContent onSuccess={() =>{ setIsDialogOpen(false); toast.success("Produto criado com sucesso!",{position: "top-center"})}}/>
+      <UpsertDialogContent setDialogIsOpen={setIsDialogOpen}/>
      
     </Dialog>
   );

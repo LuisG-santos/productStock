@@ -18,24 +18,41 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   UpsertProdutcSchema,
-  upsertProductSchema
+  upsertProductSchema,
 } from "@/app/_actions/products/upsert-products/schema";
 import { Input } from "@/app/_components/ui/input";
 import { Button } from "@/app/_components/ui/button";
 import { Loader2Icon } from "lucide-react";
 import { NumericFormat } from "react-number-format";
 import { upsertProducts } from "@/app/_actions/products/upsert-products";
+import { toast } from "sonner";
+import { useAction } from "next-safe-action/hooks";
+import { Dispatch, SetStateAction } from "react";
 
 interface UpsertDialogContentProps {
   defaultValues?: UpsertProdutcSchema;
-  onSuccess?: () => void;
+  setDialogIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const UpsertDialogContent = ({
-  onSuccess,
+  setDialogIsOpen,
   defaultValues,
 }: UpsertDialogContentProps) => {
   const isEditing = !!defaultValues;
+  const {execute: executeUpsertProducts} = useAction(upsertProducts, {
+    onSuccess: () => {
+      toast.success(`Produto ${isEditing ? "atualizado" : "criado"} com sucesso!`, {
+        position: "top-center",
+      });
+      setDialogIsOpen(false);
+    },
+    onError: (error) => {
+      toast.error("Erro ao criar produto. Verifique os dados e tente novamente.", {
+        position: "top-center",
+      });
+    },
+    
+  });
 
   const form = useForm<UpsertProdutcSchema>({
     shouldUnregister: true,
@@ -47,19 +64,10 @@ const UpsertDialogContent = ({
     },
   });
 
-  const onSubmit = async (data: UpsertProdutcSchema) => {
-    try {
-      await upsertProducts({...data, id: defaultValues?.id});
-      onSuccess?.();
-    } catch (error) {
-      console.error("Erro ao criar produto:", error);
-    }
-  };
-
   return (
     <DialogContent>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(executeUpsertProducts)} className="space-y-4">
           <DialogHeader>
             <DialogTitle>
               {isEditing ? "Editar produto" : "Criar produto"}

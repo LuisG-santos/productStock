@@ -28,7 +28,7 @@ interface ProductsDropdownProps {
 }
 
 const ProductsDropdown = ({ product }: ProductsDropdownProps) => {
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogIsOpen] = useState(false);
   
 
   async function handleCopy() {
@@ -39,7 +39,7 @@ const ProductsDropdown = ({ product }: ProductsDropdownProps) => {
 
   return (
     <AlertDialog>
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogIsOpen}>
         <DropdownMenu>
 
           <DropdownMenuTrigger asChild>
@@ -84,7 +84,7 @@ const ProductsDropdown = ({ product }: ProductsDropdownProps) => {
             price: Number(product.price),
             stock: product.stock,
           }}
-          onSuccess={() => setEditDialogOpen(false)}
+          setDialogIsOpen={setEditDialogIsOpen}
         />
         <DeleteDialog productID={product.id} name={product.name} />
       </Dialog>
