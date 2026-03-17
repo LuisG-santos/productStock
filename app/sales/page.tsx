@@ -1,8 +1,6 @@
-
 import { ComboboxOption } from "../_components/ui/combobox";
 import { getProducts } from "../_data-accsess/products/getProducts";
 import CreateSaleButton from "./_components/create-sale-button";
-
 
 const SalesPage = async () => {
   const products = await getProducts();
@@ -22,8 +20,6 @@ const SalesPage = async () => {
         </div>
         <CreateSaleButton products={products} productOption={productOptions} />
       </div>
-
-
     </div>
   );
 };
